@@ -26,7 +26,7 @@ func (a *AuthRepo) CreateUser(user *User) error {
 
 func (a *AuthRepo) GetUserByEmail(email string) (*User, error) {
 	var user User
-	err := a.Db.Where("email = ?", email).First(&user).Error
+	err := a.Db.Preload("Wallet").Where("email = ?", email).First(&user).Error
 	if err != nil {
 		log.Println("couldn't find user with given email:", err.Error())
 		return nil, err

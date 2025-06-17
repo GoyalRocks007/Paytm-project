@@ -28,7 +28,8 @@ func main() {
 	authController := controllers.NewAuthController(initAuthModule(db.GetDbConnection()))
 
 	router.GET("/hello", authController.HelloWorld)
-	router.POST("/signup", authController.CreateUser)
+	router.POST("auth/signup", authController.CreateUser)
+	router.POST("auth/signin", authController.UserLogin)
 
 	// Start server
 	router.Run(":8080")
