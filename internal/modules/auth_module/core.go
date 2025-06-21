@@ -3,11 +3,13 @@ package authmodule
 import (
 	"errors"
 	"log"
+	"paytm-project/internal/models"
 )
 
 type IAuthCore interface {
 	UserSignup(signupRequest *SignupRequestDto) (*SignupResponseDto, error)
 	UserLogin(loginRequest *LoginRequestDto) (string, error)
+	GetRepo() IAuthRepo
 }
 
 type AuthCore struct {
@@ -27,7 +29,9 @@ func (a *AuthCore) UserSignup(signupRequest *SignupRequestDto) (*SignupResponseD
 	if err != nil {
 		return nil, err
 	}
-	return &SignupResponseDto{Success: true}, nil
+	return &SignupResponseDto{BaseSuccessResponse: models.BaseSuccessResponse{
+		Success: true,
+	}}, nil
 }
 
 func (a *AuthCore) UserLogin(loginRequest *LoginRequestDto) (string, error) {
@@ -52,4 +56,8 @@ func (a *AuthCore) UserLogin(loginRequest *LoginRequestDto) (string, error) {
 	}
 
 	return token, nil
+}
+
+func (ac *AuthCore) GetRepo() IAuthRepo {
+	return ac.AuthRepo
 }
