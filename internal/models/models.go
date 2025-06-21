@@ -13,6 +13,10 @@ type BaseModel struct {
 	UpdatedAt int64
 }
 
+type BaseSuccessResponse struct {
+	Success bool `json:"success"`
+}
+
 type BaseRepo struct {
 	Db *gorm.DB
 }

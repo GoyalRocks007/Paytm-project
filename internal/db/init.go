@@ -3,6 +3,7 @@ package db
 import (
 	"log"
 	authmodule "paytm-project/internal/modules/auth_module"
+	paymentsmodule "paytm-project/internal/modules/payments_module"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -29,7 +30,7 @@ func InitDb() {
 
 	DbConnection = db
 
-	err = db.AutoMigrate(&authmodule.User{}, &authmodule.Wallet{})
+	err = db.AutoMigrate(&authmodule.User{}, &authmodule.Wallet{}, &paymentsmodule.Payment{})
 	if err != nil {
 		log.Fatalf("migration failed: %v", err)
 	}

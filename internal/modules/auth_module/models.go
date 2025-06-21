@@ -31,7 +31,7 @@ type SignupRequestDto struct {
 }
 
 type SignupResponseDto struct {
-	Success bool `json:"success"`
+	models.BaseSuccessResponse
 }
 
 type LoginRequestDto struct {
@@ -40,7 +40,7 @@ type LoginRequestDto struct {
 }
 
 type LoginResponseDto struct {
-	Success bool `json:"success"`
+	models.BaseSuccessResponse
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {

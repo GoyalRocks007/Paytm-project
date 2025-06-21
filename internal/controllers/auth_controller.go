@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"paytm-project/internal/models"
 	authmodule "paytm-project/internal/modules/auth_module"
 
 	"github.com/gin-gonic/gin"
@@ -65,5 +66,7 @@ func (ac *AuthController) UserLogin(c *gin.Context) {
 	}
 
 	c.Header("X-Auth-Token", token)
-	c.JSON(http.StatusOK, authmodule.LoginResponseDto{Success: true})
+	c.JSON(http.StatusOK, authmodule.LoginResponseDto{BaseSuccessResponse: models.BaseSuccessResponse{
+		Success: true,
+	}})
 }
