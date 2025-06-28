@@ -2,8 +2,10 @@ package authmodule
 
 import (
 	"errors"
+	"log"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -75,10 +77,28 @@ func VerifyJWT(tokenString string) (jwt.MapClaims, error) {
 		return nil, err
 	}
 
+	claims, ok := token.Claims.(jwt.MapClaims)
 	// Check if token is valid
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+	if ok && token.Valid {
 		return claims, nil
 	}
 
+	// Check expiry
+	if exp, ok := claims["exp"].(float64); ok {
+		log.Println("hello time 2", exp, time.Now().Unix())
+		if int64(exp) < time.Now().Unix() {
+			return nil, errors.New("token expired")
+		}
+	}
+
 	return nil, errors.New("invalid token")
+}
+
+func GetClaims(c *gin.Context) (jwt.MapClaims, bool) {
+	val, exists := c.Get("claims")
+	if !exists {
+		return nil, false
+	}
+	claims, ok := val.(jwt.MapClaims)
+	return claims, ok
 }

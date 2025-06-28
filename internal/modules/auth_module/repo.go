@@ -12,6 +12,7 @@ type IAuthRepo interface {
 	GetUserByEmail(email string) (*User, error)
 	GetUserByEmailTransactional(tx *gorm.DB, email string) (*User, error)
 	UpdateWalletBalance(tx *gorm.DB, userId string, delta float64) error
+	UpdateUserRole(user *User) error
 }
 
 type AuthRepo struct {
@@ -52,4 +53,11 @@ func (a *AuthRepo) UpdateWalletBalance(tx *gorm.DB, userId string, delta float64
 	return tx.Model(&Wallet{}).
 		Where("user_id = ?", userId).
 		Update("balance", gorm.Expr("balance + ?", delta)).Error
+}
+
+func (a *AuthRepo) UpdateUserRole(user *User) error {
+	return a.Db.
+		Model(&User{}).
+		Where("email = ?", user.Email).
+		Update("role", user.Role).Error
 }

@@ -6,6 +6,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type Resource string
+type Role string
+
+const (
+	AdminRoleName Role = "ADMIN"
+	UserRoleName  Role = "USER"
+)
+
 type User struct {
 	models.BaseModel
 	Name     string
@@ -14,6 +22,7 @@ type User struct {
 	Username string `gorm:"unique"`
 	Wallet   Wallet `gorm:"foreignKey:UserId" json:"wallet"`
 	Password string
+	Role     Role
 }
 
 type Wallet struct {
@@ -47,9 +56,16 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	if err := u.BaseModel.BeforeCreate(tx); err != nil {
 		return err
 	}
-
+	u.Role = UserRoleName
 	u.Wallet = Wallet{
 		Balance: 10000,
 	}
 	return
+}
+
+func (r *Role) ValidateRole() bool {
+	if *r == UserRoleName || *r == AdminRoleName {
+		return true
+	}
+	return false
 }
