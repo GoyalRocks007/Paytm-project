@@ -16,6 +16,10 @@ type AuthCore struct {
 	AuthRepo IAuthRepo
 }
 
+func (ac *AuthCore) GetRepo() IAuthRepo {
+	return ac.AuthRepo
+}
+
 func (a *AuthCore) UserSignup(signupRequest *SignupRequestDto) (*SignupResponseDto, error) {
 	hashedPassword, perr := HashPassword(signupRequest.Password)
 	if perr != nil {
@@ -47,6 +51,7 @@ func (a *AuthCore) UserLogin(loginRequest *LoginRequestDto) (string, error) {
 		"email":   user.Email,
 		"wallet":  user.Wallet.Id,
 		"balance": user.Wallet.Balance,
+		"role":    user.Role,
 	}
 
 	token, terr := GenerateJwt(claims)
@@ -56,8 +61,4 @@ func (a *AuthCore) UserLogin(loginRequest *LoginRequestDto) (string, error) {
 	}
 
 	return token, nil
-}
-
-func (ac *AuthCore) GetRepo() IAuthRepo {
-	return ac.AuthRepo
 }

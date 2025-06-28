@@ -9,5 +9,6 @@ import (
 func InitModuleRegistry(db *gorm.DB) *modules.Registry {
 	return modules.GetRegistry().
 		WithAuthModule(db).
-		WithPaymentsModule(db)
+		WithPaymentsModule(db).
+		WithAdminModule(db)
 }
