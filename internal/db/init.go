@@ -2,6 +2,7 @@ package db
 
 import (
 	"log"
+	gmailclient "paytm-project/internal/clients/email_client/gmail_client"
 	authmodule "paytm-project/internal/modules/auth_module"
 	paymentsmodule "paytm-project/internal/modules/payments_module"
 
@@ -30,7 +31,7 @@ func InitDb() {
 
 	DbConnection = db
 
-	err = db.AutoMigrate(&authmodule.User{}, &authmodule.Wallet{}, &paymentsmodule.Payment{})
+	err = db.AutoMigrate(&authmodule.User{}, &authmodule.Wallet{}, &paymentsmodule.Payment{}, &gmailclient.TokenStorage{})
 	if err != nil {
 		log.Fatalf("migration failed: %v", err)
 	}

@@ -7,12 +7,17 @@ import (
 )
 
 type IAdminCore interface {
+	GetRepo() IAdminRepo
 	UpdateRole(req *UpdateRoleRequestDto) (*UpdateRoleResponseDto, error)
 }
 
 type AdminCore struct {
 	AdminRepo  IAdminRepo
 	AuthModule authmodule.IAuthModule
+}
+
+func (ac *AdminCore) GetRepo() IAdminRepo {
+	return ac.AdminRepo
 }
 
 func (c *AdminCore) UpdateRole(req *UpdateRoleRequestDto) (*UpdateRoleResponseDto, error) {
