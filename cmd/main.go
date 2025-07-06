@@ -1,34 +1,33 @@
 package main
 
 import (
-	"context"
 	"os"
 	"paytm-project/boot"
 	"paytm-project/internal/controllers"
 	"paytm-project/internal/db"
 	"paytm-project/middlewares"
+	"paytm-project/redis"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	router := gin.Default()
-	db.InitDb()
 	if os.Getenv("APP_ENV") != "prod" {
 		err := godotenv.Load(".env")
 		if err != nil {
-			panic("env file not find")
+			panic("env file not found")
 		}
 	}
+	router := gin.Default()
+	db.InitDb()
+	redis.InitRedis()
 	// Register controller routes
 	moduleRegistry := boot.InitModuleRegistry(db.GetDbConnection())
-	clientRegistery := boot.InitClientRegistery(db.GetDbConnection())
+	clientRegistery := boot.InitClientRegistery(db.GetDbConnection(), redis.GetRedisClientConnection())
 	authController := controllers.NewAuthController(moduleRegistry.AuthModule)
 	paymentsController := controllers.NewPaymentsController(moduleRegistry.PaymentsModule)
 	adminController := controllers.NewAdminController(moduleRegistry.AdminModule, clientRegistery.EmailClient)
-
-	clientRegistery.EmailClient.SendEmail(context.Background(), os.Getenv("GOOGLE_EMAIL_ADDRESS"), "abhi25goyal@gmail.com", "Jai Shri Ram", "Hi Abhi, This is to confirm the email client is working fine!")
 
 	adminRoutes := router.Group("/admin", middlewares.AuthMiddleware(), middlewares.CheckAdmin())
 	{
