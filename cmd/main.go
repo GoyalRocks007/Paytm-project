@@ -23,16 +23,23 @@ func main() {
 	db.InitDb()
 	redis.InitRedis()
 	// Register controller routes
-	moduleRegistry := boot.InitModuleRegistry(db.GetDbConnection())
 	clientRegistery := boot.InitClientRegistery(db.GetDbConnection(), redis.GetRedisClientConnection())
+	moduleRegistry := boot.InitModuleRegistry(db.GetDbConnection(), clientRegistery)
 	authController := controllers.NewAuthController(moduleRegistry.AuthModule)
 	paymentsController := controllers.NewPaymentsController(moduleRegistry.PaymentsModule)
 	adminController := controllers.NewAdminController(moduleRegistry.AdminModule, clientRegistery.EmailClient)
+	otpController := controllers.NewOtpController(moduleRegistry.OtpModule)
 
 	adminRoutes := router.Group("/admin", middlewares.AuthMiddleware(), middlewares.CheckAdmin())
 	{
 		adminRoutes.PUT("/role", adminController.UpdateRole)
 		adminRoutes.GET("/auth", adminController.StartAuth)
+	}
+
+	otpRoutes := router.Group("/otp")
+	{
+		otpRoutes.POST("/generate", otpController.GenerateOtp)
+		otpRoutes.POST("/verify", otpController.VerifyOtp)
 	}
 	router.GET("/oauth2callback", adminController.HandleCallback)
 	router.GET("/hello", authController.HelloWorld)
