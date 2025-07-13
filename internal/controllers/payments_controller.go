@@ -85,7 +85,7 @@ func (pc *PaymentsController) VerifyOtpForPayment(c *gin.Context) {
 
 	c.Header("payment-id", res)
 
-	c.JSON(http.StatusOK, res)
+	c.JSON(http.StatusOK, nil)
 }
 
 func (pc *PaymentsController) ExecutePayment(c *gin.Context) {
