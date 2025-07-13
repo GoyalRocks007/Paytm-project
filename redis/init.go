@@ -23,7 +23,6 @@ func InitRedis() error {
 	// addr := os.Getenv("REDIS_HOST")         // e.g., "localhost:6379"
 	// password := os.Getenv("REDIS_PASSWORD") // "" if no password
 	// db := 0                                 // can make this env-controlled too
-	// log.Println("twadi nu!!!")
 	// RDB = redis.NewClient(&redis.Options{
 	// 	Addr:      addr,
 	// 	Password:  password,
@@ -38,7 +37,7 @@ func InitRedis() error {
 		log.Fatalf("failed to parse redis url: %v", err)
 	}
 
-	RDB := redis.NewClient(opt)
+	RDB = redis.NewClient(opt)
 
 	if err := RDB.Ping(ctx).Err(); err != nil {
 		log.Fatalf("redis ping failed: %s", err.Error())

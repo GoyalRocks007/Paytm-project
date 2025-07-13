@@ -3,6 +3,7 @@ package authmodule
 import (
 	"errors"
 	"log"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +12,14 @@ import (
 )
 
 var (
-	jwtSecret string = "abcdefghijklmnopqrstuvwxyz"
+	jwtSecret string
+	GetSecret = func() string {
+		if jwtSecret != "" {
+			return jwtSecret
+		}
+		jwtSecret = os.Getenv("JWT_SECRET")
+		return jwtSecret
+	}
 )
 
 func SignupRequestDtoToUserMapper(signupRequestDto *SignupRequestDto) *User {
@@ -59,7 +67,7 @@ func GenerateJwt(claimsMap map[string]interface{}) (string, error) {
 
 	// Create and sign token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(jwtSecret))
+	return token.SignedString([]byte(GetSecret()))
 }
 
 func VerifyJWT(tokenString string) (jwt.MapClaims, error) {
@@ -69,7 +77,7 @@ func VerifyJWT(tokenString string) (jwt.MapClaims, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
-		return []byte(jwtSecret), nil
+		return []byte(GetSecret()), nil
 	})
 
 	// Error while parsing
