@@ -34,7 +34,7 @@ func (r *Registry) WithAuthModule(db *gorm.DB) *Registry {
 }
 
 func (r *Registry) WithPaymentsModule(db *gorm.DB) *Registry {
-	r.PaymentsModule = paymentsmodule.GetPaymentsModule(db, r.AuthModule)
+	r.PaymentsModule = paymentsmodule.GetPaymentsModule(db, r.AuthModule, r.OtpModule)
 	return r
 }
 

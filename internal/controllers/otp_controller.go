@@ -52,7 +52,7 @@ func (ac *OtpController) VerifyOtp(c *gin.Context) {
 		return
 	}
 
-	res, token, err := ac.otpModule.GetCore().VerifyOtp(ctx, &req)
+	res, token, _, err := ac.otpModule.GetCore().VerifyOtp(ctx, &req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": err.Error(),

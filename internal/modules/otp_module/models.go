@@ -6,10 +6,12 @@ type Otp struct {
 	Code     string
 	Exp      int64
 	Attempts int16
+	Claims   map[string]interface{}
 }
 
 type GenerateOtpRequest struct {
 	Receiver string `json:"receiver"`
+	Claims   map[string]interface{}
 }
 
 type GenerateOtpResponse struct {

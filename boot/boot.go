@@ -11,9 +11,9 @@ import (
 func InitModuleRegistry(db *gorm.DB, clients *clients.ClientRegistry) *modules.Registry {
 	return modules.GetRegistry().
 		WithAuthModule(db).
-		WithPaymentsModule(db).
 		WithAdminModule(db).
-		WithOtpModule(clients)
+		WithOtpModule(clients).
+		WithPaymentsModule(db)
 }
 
 func InitClientRegistery(db *gorm.DB, rdb *redis.Client) *clients.ClientRegistry {
