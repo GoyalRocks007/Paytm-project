@@ -2,6 +2,7 @@ package db
 
 import (
 	"log"
+	"os"
 	gmailclient "paytm-project/internal/clients/email_client/gmail_client"
 	authmodule "paytm-project/internal/modules/auth_module"
 	paymentsmodule "paytm-project/internal/modules/payments_module"
@@ -11,7 +12,6 @@ import (
 )
 
 var (
-	dsn             string = "root:12345678@tcp(localhost:3306)/paytm?charset=utf8mb4&parseTime=True&loc=Local"
 	DbConnection    *gorm.DB
 	GetDbConnection = func() *gorm.DB {
 		if DbConnection != nil {
@@ -22,6 +22,7 @@ var (
 )
 
 func InitDb() {
+	var dsn string = os.Getenv("DB_CONNECTION_URL")
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 

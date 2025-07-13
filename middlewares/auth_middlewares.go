@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"context"
 	"log"
 	"net/http"
 	authmodule "paytm-project/internal/modules/auth_module"
@@ -105,6 +106,24 @@ func CheckAdmin() gin.HandlerFunc {
 			return
 		}
 
+		c.Next() // Proceed to the next middleware or controller
+	}
+}
+
+func ExtractClaimsToCtx() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		claims, ok := authmodule.GetClaims(c)
+		if !ok {
+			log.Println("No claims present!")
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			c.Abort()
+			return
+		}
+		ctx := c.Request.Context()
+		for key, value := range claims {
+			ctx = context.WithValue(ctx, key, value) // Add the claim to the
+		}
+		c.Request = c.Request.WithContext(ctx)
 		c.Next() // Proceed to the next middleware or controller
 	}
 }

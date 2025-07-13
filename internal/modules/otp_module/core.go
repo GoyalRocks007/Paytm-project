@@ -24,7 +24,7 @@ var (
 type IOtpCore interface {
 	GenerateOtp(ctx context.Context, generateOtpRequest *GenerateOtpRequest) (*GenerateOtpResponse, error)
 	SendOtp(ctx context.Context, otp string, receiver string) error
-	VerifyOtp(ctx context.Context, verifyOtpRequest *VerifyOtpRequest) (*VerifyOtpResponse, string, error)
+	VerifyOtp(ctx context.Context, verifyOtpRequest *VerifyOtpRequest) (*VerifyOtpResponse, string, map[string]interface{}, error)
 }
 
 type OtpCore struct {
@@ -41,6 +41,7 @@ func (oc *OtpCore) GenerateOtp(ctx context.Context, generateOtpRequest *Generate
 		&Otp{
 			Code:     otp,
 			Attempts: 0,
+			Claims:   generateOtpRequest.Claims,
 		},
 		time.Minute*5)
 	err = oc.SendOtp(ctx, otp, generateOtpRequest.Receiver)
@@ -66,38 +67,38 @@ func (oc *OtpCore) SendOtp(ctx context.Context, otp string, receiver string) err
 	)
 }
 
-func (oc *OtpCore) VerifyOtp(ctx context.Context, verifyOtpRequest *VerifyOtpRequest) (*VerifyOtpResponse, string, error) {
+func (oc *OtpCore) VerifyOtp(ctx context.Context, verifyOtpRequest *VerifyOtpRequest) (*VerifyOtpResponse, string, map[string]interface{}, error) {
 	receiver := verifyOtpRequest.Receiver
 	var otp Otp
 	data, exist, err := oc.clients.RedisClient.Get(ctx, receiver)
 	if !exist || err != nil {
-		return nil, "", errors.New("otp expired please try again")
+		return nil, "", nil, errors.New("otp expired please try again")
 	}
 	jsonData, err1 := json.Marshal(data)
 	if err1 != nil {
-		return nil, "", err
+		return nil, "", nil, err
 	}
 	if err2 := json.Unmarshal(jsonData, &otp); err != nil {
-		return nil, "", err2
+		return nil, "", nil, err2
 	}
 
 	if otp.Code == verifyOtpRequest.Otp {
 		err := oc.clients.RedisClient.Del(ctx, receiver)
 		if err != nil {
 			log.Println("error in deleting key", receiver, err.Error())
-			return nil, "", err
+			return nil, "", nil, err
 		}
 		token, err := authmodule.GenerateJwt(map[string]interface{}{
 			"receiver": verifyOtpRequest.Receiver,
 		})
 		if err != nil {
-			return nil, "", errors.New("error generating token")
+			return nil, "", nil, errors.New("error generating token")
 		}
 		return &VerifyOtpResponse{
 			BaseSuccessResponse: models.BaseSuccessResponse{Success: true},
-		}, token, nil
+		}, token, otp.Claims, nil
 	} else {
-		return nil, "", errors.New("invalid otp")
+		return nil, "", nil, errors.New("invalid otp")
 	}
 
 }

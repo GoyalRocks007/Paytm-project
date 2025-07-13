@@ -48,6 +48,7 @@ func (a *AuthCore) UserLogin(loginRequest *LoginRequestDto) (string, error) {
 	}
 
 	claims := map[string]interface{}{
+		"id":      user.Id,
 		"email":   user.Email,
 		"wallet":  user.Wallet.Id,
 		"balance": user.Wallet.Balance,

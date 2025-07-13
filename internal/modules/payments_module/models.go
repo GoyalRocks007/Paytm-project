@@ -13,8 +13,10 @@ const (
 	NEFT PaymentMedium = "NEFT"
 	UPI  PaymentMedium = "UPI"
 
-	SUCCESS PaymentStatus = "SUCCESS"
-	FAIL    PaymentStatus = "FAIL"
+	PaymentStatusSuccess    PaymentStatus = "SUCCESS"
+	PaymentStatusInitiated  PaymentStatus = "INITIATED"
+	PaymentStatusAuthorized PaymentStatus = "AUTHORIZED"
+	PaymentStatusFailed     PaymentStatus = "FAIL"
 )
 
 type Payment struct {
@@ -28,13 +30,26 @@ type Payment struct {
 	Status     PaymentStatus
 }
 
-type CreatePaymentRequestDto struct {
+type InitiatePaymentRequestDto struct {
 	Sender   string
 	Receiver string
 	Amount   float64
 	Mode     PaymentMedium
 }
 
-type CreatePaymentResponseDto struct {
+type InitiatePaymentResponseDto struct {
 	models.BaseSuccessResponse
+	PaymentId string `json:"paymentId"`
+}
+
+type ExecutePaymentResponseDto struct {
+	models.BaseSuccessResponse
+}
+
+type ExecutePaymentRequest struct {
+	PaymentId string
+	Sender    string
+	Receiver  string
+	Amount    float64
+	Mode      PaymentMedium
 }

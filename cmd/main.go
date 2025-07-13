@@ -41,12 +41,20 @@ func main() {
 		otpRoutes.POST("/generate", otpController.GenerateOtp)
 		otpRoutes.POST("/verify", otpController.VerifyOtp)
 	}
+
+	paymentRoutes := router.Group("/payment", middlewares.AuthMiddleware(), middlewares.ExtractClaimsToCtx())
+	{
+		paymentRoutes.POST("/initiate", paymentsController.InitiatePayment)
+		paymentRoutes.GET("/generate/otp/:id", paymentsController.GenerateOtpForPayment)
+		paymentRoutes.POST("/verify/otp", paymentsController.VerifyOtpForPayment)
+		paymentRoutes.GET("/execute/:id", paymentsController.ExecutePayment)
+	}
+
 	router.GET("/oauth2callback", adminController.HandleCallback)
 	router.GET("/hello", authController.HelloWorld)
 	router.POST("auth/signup", authController.CreateUser)
 	router.POST("auth/signin", authController.UserLogin)
 
-	router.POST("/payment/create", paymentsController.CreatePayment)
 	// Start server
 	router.Run(":8080")
 }
