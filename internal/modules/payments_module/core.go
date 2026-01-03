@@ -54,10 +54,8 @@ func (pc *PaymentsCore) InitiatePayment(ctx context.Context, initiatePaymentRequ
 
 }
 
-/*************  ✨ Windsurf Command ⭐  *************/
 // GenerateOtpForPayment generates an otp for a given payment id, using the email stored in the context.
 // It is called by the PaymentsController, and the generated otp is sent to the user to verify the payment.
-/*******  183fe196-3c70-4ad9-a873-965207abebf8  *******/
 func (pc *PaymentsCore) GenerateOtpForPayment(ctx context.Context, paymentId string) (*otpmodule.GenerateOtpResponse, error) {
 	email := ctx.Value("email").(string)
 	generateOtpRequest := &otpmodule.GenerateOtpRequest{
