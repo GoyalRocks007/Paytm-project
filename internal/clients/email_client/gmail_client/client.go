@@ -73,6 +73,45 @@ func (gc *GmailClient) FetchToken(ctx context.Context, config *oauth2.Config, us
 	return freshToken, nil
 }
 
+func (gc *GmailClient) SendHtmlEmail(ctx context.Context, userID, to, subject, body string) error {
+	config, err := GetOAuthConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get OAuth config: %v", err)
+	}
+
+	freshToken, err := gc.FetchToken(ctx, config, userID)
+	if err != nil {
+		return fmt.Errorf("failed to fetch token: %v", err)
+	}
+
+	client := config.Client(ctx, freshToken)
+	srv, err := gmail.NewService(ctx, option.WithHTTPClient(client))
+	if err != nil {
+		return fmt.Errorf("failed to create Gmail service: %v", err)
+	}
+
+	msgStr := fmt.Sprintf(
+		"From: me\r\n"+
+			"To: %s\r\n"+
+			"Subject: %s\r\n"+
+			"MIME-Version: 1.0\r\n"+
+			"Content-Type: text/html; charset=UTF-8\r\n\r\n"+
+			"%s",
+		to, subject, body,
+	)
+
+	message := &gmail.Message{
+		Raw: EncodeMessage(msgStr),
+	}
+
+	_, err = srv.Users.Messages.Send("me", message).Do()
+	if err != nil {
+		return fmt.Errorf("failed to send email: %v", err)
+	}
+
+	return nil
+}
+
 func (gc *GmailClient) SendEmail(ctx context.Context, userID, to, subject, body string) error {
 
 	// Get OAuth config

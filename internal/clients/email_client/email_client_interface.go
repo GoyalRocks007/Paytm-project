@@ -30,6 +30,7 @@ var (
 )
 
 type IEmailClient interface {
+	SendHtmlEmail(ctx context.Context, userID, to, subject, body string) error
 	SendEmail(ctx context.Context, userID, to, subject, body string) error
 	StartAuth(ctx context.Context) (string, error)
 	HandleCallback(ctx context.Context, code string) error
